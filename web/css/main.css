@@ -1,0 +1,60 @@
+html,body {
+    margin: 10px;
+    font-family: 'Arial', sans-serif;
+}
+
+.hide {
+    display: none;
+}
+
+.login-container {
+    border-radius: 15px;
+}
+
+h1, h2, h3 {
+    text-align: center;
+}
+
+td .button {
+    margin: 25px;
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+    border: 2px solid #009;
+    padding: 20px;
+}
+
+textarea {
+    margin-top: 10px;
+    margin-bottom: 10px
+}
+
+.err_msg {
+    color: red;
+}
+
+#status {
+    margin-top: 20px;
+    text-align: center;
+    color: red;
+    font-style: italic;
+    font-weight: bold;
+}
+
+input.text { 
+    margin-bottom:12px; 
+    width:95%; 
+    padding: .5em;
+    height: 20px;
+    border-radius: 5px;
+}
+
+#inventoryReceived label {
+    text-align: right;
+    margin-right: 20px;
+    width: 200px;
+    float: left;
+    font-weight: bold;
+}
