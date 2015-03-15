@@ -7,34 +7,6 @@ html,body {
     display: none;
 }
 
-.login-container {
-    border-radius: 15px;
-}
-
-h1, h2, h3 {
-    text-align: center;
-}
-
-td .button {
-    margin: 25px;
-}
-
-table {
-    margin-left: auto;
-    margin-right: auto;
-    border: 2px solid #009;
-    padding: 20px;
-}
-
-textarea {
-    margin-top: 10px;
-    margin-bottom: 10px
-}
-
-.err_msg {
-    color: red;
-}
-
 #status {
     margin-top: 20px;
     text-align: center;
@@ -43,18 +15,55 @@ textarea {
     font-weight: bold;
 }
 
-input.text { 
+
+h1, h2, h3 {
+    text-align: center;
+}
+
+.login-container {
+    border-radius: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 2px solid #009;
+    padding: 20px;
+    width: 30%;
+}
+
+.login-container p {
+    text-align: center;
+}
+
+.login-container label {
+    text-align: center;
+    margin-right: 20px;
+    width: 200px;
+    font-weight: bold;
+}
+
+.login-container .button {
+    margin: 25px;
+}
+
+.login-container input.text {
     margin-bottom:12px; 
-    width:95%; 
+    width:40%;
     padding: .5em;
     height: 20px;
     border-radius: 5px;
 }
 
-#inventoryReceived label {
+.inventory-container label {
     text-align: right;
     margin-right: 20px;
     width: 200px;
     float: left;
     font-weight: bold;
+}
+
+.inventory-container input.text {
+    margin-bottom:12px;
+    width:20%;
+    padding: .5em;
+    height: 20px;
+    border-radius: 5px;
 }
