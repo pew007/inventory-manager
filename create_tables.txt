@@ -108,6 +108,10 @@ INSERT INTO platform (platformName) VALUES('Wii');
 INSERT INTO platform (platformName) VALUES('Will U');
 
 INSERT INTO user (username, password) VALUES ('cs645', '6CE43F067B9180FF21551DB797AC8BFD');
+INSERT INTO user (username, password) VALUES ('pwang', '202CB962AC59075B964B07152D234B70');
+INSERT INTO user (username, password) VALUES ('abc', '202CB962AC59075B964B07152D234B70');
+INSERT INTO user (username, password) VALUES ('sdsu', '2CCD4222A249AEE72A613173988D11B6');
+INSERT INTO user (username, password) VALUES ('test', '2CCD4222A249AEE72A613173988D11B6');
 
 INSERT INTO product VALUES ('ABC-123', 2, 3, 1, 'NBA 2K15', 'Popular basketball game', 'Feature 1. Feature 2.', 20, 60, 'abc-123.jpg');
 INSERT INTO product VALUES ('BCD-234', 1, 5, 3, 'FIFA 15', 'Popular soccer game', 'Feature 1. Feature 2.', 20, 60, 'bcd-234.jpg');
