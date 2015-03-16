@@ -14,19 +14,21 @@ public class Product {
     private String vendor;
     private String productName;
     private Date   receivedDate;
+    private Date   sentDate;
     private Date   lastModifiedDate;
     private int    quantityReceived;
     private int    quantitySent;
 
-    public Product(String sku, String productName, String category, String vendor) {
-        this.sku = sku;
-        this.productName = productName;
-        this.category = category;
-        this.vendor = vendor;
-        this.receivedDate = new Date();
-        this.lastModifiedDate = new Date();
-        this.quantityReceived = 0;
-        this.quantitySent = 0;
+    public Product() {
+        this.sku                = null;
+        this.productName        = null;
+        this.category           = null;
+        this.vendor             = null;
+        this.receivedDate       = new Date();
+        this.sentDate           = new Date();
+        this.lastModifiedDate   = new Date();
+        this.quantityReceived   = 0;
+        this.quantitySent       = 0;
     }
 
     public String getSku() {
@@ -61,34 +63,30 @@ public class Product {
         this.category = category;
     }
 
-    public Date getReceivedDate() {
-        return receivedDate;
-    }
-
     public String getReceivedDateString() {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd");
-        String formattedDate = dateFormatter.format(this.receivedDate);
-
-        return formattedDate;
+        return dateFormatter.format(this.receivedDate);
     }
 
     public void setReceivedDate(String receivedDate) throws ParseException {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
-        Date parsedDate = dateFormatter.parse(receivedDate);
-
-        this.receivedDate = parsedDate;
+        this.receivedDate = dateFormatter.parse(receivedDate);
     }
 
-    public Date getLastModifiedDate() {
-        return lastModifiedDate;
+    public String getSentDateString() {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd");
+        return dateFormatter.format(this.sentDate);
+    }
+
+    public void setSentDate(String sentDate) throws ParseException {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
+        this.sentDate = dateFormatter.parse(sentDate);
     }
 
     public String getLastModifiedDateString() {
         Date today = new Date();
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd");
-        String formattedDate = dateFormatter.format(today);
-
-        return formattedDate;
+        return dateFormatter.format(today);
     }
 
     public int getQuantityReceived() {
@@ -108,14 +106,24 @@ public class Product {
     }
 
     public static Product fetchProductFromDB(String sku) {
-        Vector<String[]> result = DBHelper.doQuery("SELECT vendorModel, categoryName, vendorName FROM product, category, vendor WHERE product.sku = '" + sku
-                + "' AND category.categoryID = product.categoryID AND vendor.vendorID = product.vendorID");
+        Vector<String[]> result = DBHelper
+                .doQuery("SELECT vendorModel, categoryName, vendorName " +
+                        "FROM product, category, vendor " +
+                        "WHERE product.sku = '" + sku + "' " +
+                        "AND category.categoryID = product.categoryID " +
+                        "AND vendor.vendorID = product.vendorID");
 
         if (!result.isEmpty()) {
             String productName = result.elementAt(0)[0];
             String category = result.elementAt(0)[1];
             String vendor = result.elementAt(0)[2];
-            return new Product(sku, productName, category, vendor);
+
+            Product product = new Product();
+            product.setSku(sku);
+            product.setProductName(productName);
+            product.setCategory(category);
+            product.setVendor(vendor);
+            return product;
         }
 
         return null;
@@ -130,12 +138,16 @@ public class Product {
     }
 
     private boolean isProductOnHand() throws Exception {
-        Vector<String[]> result = DBHelper.doQuery("SELECT * FROM `on_hand` WHERE sku='" + this.getSku() + "'");
+        Vector<String[]> result = DBHelper
+                .doQuery("SELECT * FROM `on_hand` WHERE sku='" + this.getSku() + "'");
         return !result.isEmpty();
     }
 
     private void receiveExistingProduct() throws Exception {
-        DBHelper.doUpdate("UPDATE `merchandise_in` SET date='" + this.getReceivedDateString() + "', quantity='" + this.getQuantityReceived() + "' WHERE sku='" + this.getSku() + "'");
+        DBHelper.doUpdate("UPDATE `merchandise_in` " +
+                "SET date='" + this.getReceivedDateString() + "', " +
+                "quantity='" + this.getQuantityReceived() + "' " +
+                "WHERE sku='" + this.getSku() + "'");
         updateInventory();
     }
 
@@ -147,5 +159,9 @@ public class Product {
     private void updateInventory() throws Exception {
         int quantity = this.getQuantityReceived() - this.getQuantitySent();
         DBHelper.doUpdate("UPDATE `on_hand` SET last_modified='" + this.getLastModifiedDateString() + "', quantity='" + quantity + "' WHERE sku='" + this.getSku() + "'");
+    }
+
+    public void send() throws Exception {
+
     }
 }

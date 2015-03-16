@@ -46,9 +46,18 @@ $(document).ready(function() {
     });
   });
 
-  $('.inventoryReceivedSubmit').on('click', function(){
-    var form = $(".inventoryReceived");
-    var url = servletHome + "ReceiveInventory";
+  $('.inventorySubmit').on('click', function(){
+    var action = $(this).data('action');
+    var url, form;
+
+    if (action == "receiveInventory") {
+      url = servletHome + "ReceiveInventory";
+      form = $(".inventoryReceived");
+    } else if (action == "sendInventory") {
+      url = servletHome + "SendInventory";
+      form = $(".inventorySent");
+    }
+
     var params = {
         'date': form.find("input[name=date]").val(),
         'sku': form.find("input[name=sku]").val(),

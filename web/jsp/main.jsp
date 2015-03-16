@@ -56,7 +56,7 @@
       </p>
     </form>
     <p>
-      <button class="button inventoryReceivedSubmit">Submit</button>
+      <button class="button inventoryReceivedSubmit inventorySubmit" data-action="receiveInventory">Submit</button>
       <input class="button" type="reset" value="Reset"/>
     </p>
   </div>
@@ -95,7 +95,7 @@
       </p>
     </form>
     <p>
-      <button class="button inventorySentSubmit">Submit</button>
+      <button class="button inventorySentSubmit inventorySubmit" data-action="sendInventory">Submit</button>
       <input class="button" type="reset" value="Reset"/>
     </p>
   </div>
