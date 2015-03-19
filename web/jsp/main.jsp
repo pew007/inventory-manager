@@ -23,7 +23,7 @@
     <li><a href="#tabs-2">Inventory Sent</a></li>
   </ul>
   <div id="tabs-1">
-    <div id="status"></div>
+    <div class="receiveStatus status"></div>
     <form class="inventoryReceived" method="post" action="">
       <p>
         <label>Date</label>
@@ -62,7 +62,7 @@
   </div>
 
   <div id="tabs-2">
-    <div id="status"></div>
+    <div class="sendStatus status"></div>
     <form class="inventorySent" method="post" action="">
       <p>
         <label>Date</label>

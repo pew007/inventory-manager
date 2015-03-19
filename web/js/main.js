@@ -66,10 +66,12 @@ $(document).ready(function() {
 
     $.post(url, params, function(response){
       if (response.status == "OK") {
-        displayMessage(response.message);
+        displayMessage(response.message, action);
+      } else {
+        displayMessage(response.message, action);
       }
     }, 'json').fail(function(){
-      displayMessage("Failed to receive inventory");
+      displayMessage("Failed to update inventory", action);
     })
   });
 
@@ -82,8 +84,14 @@ $(document).ready(function() {
     return month + "/" + day + "/" + year;
   }
 
-  function displayMessage(message) {
-    $("#status").html(message).show();
+  function displayMessage(message, action) {
+    var status;
+    if (action == 'receiveInventory') {
+      status = $(".receiveStatus");
+    } else if (action == 'sendInventory') {
+      status = $(".sendStatus")
+    }
+    status.html(message).show();
   }
 
 });

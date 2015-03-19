@@ -5,6 +5,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import util.PasswordUtilities;
 
@@ -16,10 +17,6 @@ public class Login extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-     *      response)
-     */
     @Override
     protected void doPost(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
@@ -30,11 +27,11 @@ public class Login extends HttpServlet {
 
         if (PasswordUtilities.isValidLogin(username, password)) {
             redirectUrl = "jsp/main.jsp";
-            request.getSession(true);
+            HttpSession session = request.getSession(true);
+            session.setAttribute("user", username);
         } else {
             redirectUrl = "jsp/error.jsp";
-            request.setAttribute("errorMessage",
-                    "Invalid username or password. Please log in again.");
+            request.setAttribute("errorMessage", "Invalid username or password. Please log in again.");
         }
 
         request.getRequestDispatcher(redirectUrl).forward(request, response);

@@ -35,7 +35,7 @@
         </form>
     </div>
 
-    <div id="status">
+    <div class="status">
         <%=request.getAttribute("errorMessage")%>
     </div>
 </div>

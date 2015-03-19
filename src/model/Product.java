@@ -83,6 +83,14 @@ public class Product {
         this.sentDate = dateFormatter.parse(sentDate);
     }
 
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
     public String getLastModifiedDateString() {
         Date today = new Date();
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd");
@@ -130,38 +138,86 @@ public class Product {
     }
 
     public void receive() throws Exception {
-        if (isProductOnHand()) {
-            receiveExistingProduct();
+        if (productReceived()) {
+            updateReceivedProduct();
+            updateProductOnHand();
         } else {
-            receiveNewProduct();
+            addReceivedProduct();
+            addProductOnHand();
         }
     }
 
-    private boolean isProductOnHand() throws Exception {
+    private boolean productReceived() throws Exception {
         Vector<String[]> result = DBHelper
-                .doQuery("SELECT * FROM `on_hand` WHERE sku='" + this.getSku() + "'");
+                .doQuery("SELECT * FROM `merchandise_in` WHERE sku='" + this.getSku() + "'");
         return !result.isEmpty();
     }
 
-    private void receiveExistingProduct() throws Exception {
+    private void updateReceivedProduct() throws Exception {
         DBHelper.doUpdate("UPDATE `merchandise_in` " +
                 "SET date='" + this.getReceivedDateString() + "', " +
                 "quantity='" + this.getQuantityReceived() + "' " +
                 "WHERE sku='" + this.getSku() + "'");
-        updateInventory();
     }
 
-    private void receiveNewProduct() throws Exception {
-        DBHelper.doUpdate("INSERT INTO `merchandise_in` VALUES ('" + this.getSku() + "', '" + this.getReceivedDateString() + "', '" + this.getQuantityReceived() + "')");
-        DBHelper.doUpdate("INSERT INTO `on_hand` VALUES ('" + this.getSku() + "', '" + this.getReceivedDateString() + "', '" + this.getQuantityReceived() + "')");
+    private void addReceivedProduct() throws Exception {
+        DBHelper.doUpdate("INSERT INTO `merchandise_in` VALUES ('"
+                + this.getSku() + "', '"
+                + this.getReceivedDateString() + "', '"
+                + this.getQuantityReceived() + "')");
     }
 
-    private void updateInventory() throws Exception {
+    private void addProductOnHand() {
+        DBHelper.doUpdate("INSERT INTO `on_hand` VALUES ('"
+                + this.getSku() + "', '"
+                + this.getReceivedDateString() + "', '"
+                + this.getQuantityReceived() + "')");
+    }
+
+    private void updateProductOnHand() throws Exception {
         int quantity = this.getQuantityReceived() - this.getQuantitySent();
-        DBHelper.doUpdate("UPDATE `on_hand` SET last_modified='" + this.getLastModifiedDateString() + "', quantity='" + quantity + "' WHERE sku='" + this.getSku() + "'");
+        DBHelper.doUpdate("UPDATE `on_hand` " +
+                "SET last_modified='" + this.getLastModifiedDateString() + "', " +
+                "quantity='" + quantity + "' " +
+                "WHERE sku='" + this.getSku() + "'");
     }
 
     public void send() throws Exception {
+        if (productOnHand()) {
+            if (productSent()) {
+                updateSentProduct();
+            } else {
+                addSentProduct();
+            }
+            updateProductOnHand();
+        } else {
+            throw new Exception("Product " + this.getSku() + " not on hand");
+        }
+    }
 
+    private boolean productSent() throws Exception {
+        Vector<String[]> result = DBHelper
+                .doQuery("SELECT * FROM `merchandise_out` WHERE sku='" + this.getSku() + "'");
+        return !result.isEmpty();
+    }
+
+    private void updateSentProduct() throws Exception {
+        DBHelper.doUpdate("UPDATE `merchandise_out` " +
+                "SET date='" + this.getSentDateString() + "', " +
+                "quantity='" + this.getQuantitySent() + "' " +
+                "WHERE sku='" + this.getSku() + "'");
+    }
+
+    private void addSentProduct() throws Exception {
+        DBHelper.doUpdate("INSERT INTO `merchandise_out` VALUES ('"
+                + this.getSku() + "', '"
+                + this.getReceivedDateString() + "', '"
+                + this.getQuantitySent() + "')");
+    }
+
+    private boolean productOnHand() {
+        Vector<String[]> result = DBHelper
+                .doQuery("SELECT * FROM `on_hand` WHERE sku='" + this.getSku() + "'");
+        return !result.isEmpty();
     }
 }
