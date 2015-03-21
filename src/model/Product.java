@@ -98,7 +98,17 @@ public class Product {
     }
 
     public int getQuantityReceived() {
-        return quantityReceived;
+        Vector<String[]> result = DBHelper
+                .doQuery("SELECT quantity " +
+                        "FROM product, merchandise_in " +
+                        "WHERE product.sku = '" + this.getSku() + "' " +
+                        "AND merchandise_in.sku = product.sku");
+
+        if (!result.isEmpty()) {
+            return Integer.parseInt(result.elementAt(0)[0]);
+        }
+
+        return 0;
     }
 
     public void setQuantityReceived(int quantity) {
@@ -106,7 +116,17 @@ public class Product {
     }
 
     public int getQuantitySent() {
-        return quantitySent;
+        Vector<String[]> result = DBHelper
+                .doQuery("SELECT quantity " +
+                        "FROM product, merchandise_out " +
+                        "WHERE product.sku = '" + this.getSku() + "' " +
+                        "AND merchandise_out.sku = product.sku");
+
+        if (!result.isEmpty()) {
+            return Integer.parseInt(result.elementAt(0)[0]);
+        }
+
+        return 0;
     }
 
     public void setQuantitySent(int quantitySent) {
@@ -131,6 +151,7 @@ public class Product {
             product.setProductName(productName);
             product.setCategory(category);
             product.setVendor(vendor);
+
             return product;
         }
 
@@ -156,7 +177,7 @@ public class Product {
     private void updateReceivedProduct() throws Exception {
         DBHelper.doUpdate("UPDATE `merchandise_in` " +
                 "SET date='" + this.getReceivedDateString() + "', " +
-                "quantity='" + this.getQuantityReceived() + "' " +
+                "quantity='" + this.quantityReceived + "' " +
                 "WHERE sku='" + this.getSku() + "'");
     }
 
@@ -164,14 +185,14 @@ public class Product {
         DBHelper.doUpdate("INSERT INTO `merchandise_in` VALUES ('"
                 + this.getSku() + "', '"
                 + this.getReceivedDateString() + "', '"
-                + this.getQuantityReceived() + "')");
+                + this.quantityReceived + "')");
     }
 
     private void addProductOnHand() {
         DBHelper.doUpdate("INSERT INTO `on_hand` VALUES ('"
                 + this.getSku() + "', '"
                 + this.getReceivedDateString() + "', '"
-                + this.getQuantityReceived() + "')");
+                + this.quantityReceived + "')");
     }
 
     private void updateProductOnHand() throws Exception {
@@ -184,6 +205,11 @@ public class Product {
 
     public void send() throws Exception {
         if (productOnHand()) {
+
+            if (this.getQuantitySent() > this.getQuantityReceived()) {
+                throw new Exception("Do not have enough inventory on hand for " + this.getSku());
+            }
+
             if (productSent()) {
                 updateSentProduct();
             } else {
@@ -204,7 +230,7 @@ public class Product {
     private void updateSentProduct() throws Exception {
         DBHelper.doUpdate("UPDATE `merchandise_out` " +
                 "SET date='" + this.getSentDateString() + "', " +
-                "quantity='" + this.getQuantitySent() + "' " +
+                "quantity='" + this.quantitySent + "' " +
                 "WHERE sku='" + this.getSku() + "'");
     }
 
@@ -212,7 +238,7 @@ public class Product {
         DBHelper.doUpdate("INSERT INTO `merchandise_out` VALUES ('"
                 + this.getSku() + "', '"
                 + this.getReceivedDateString() + "', '"
-                + this.getQuantitySent() + "')");
+                + this.quantitySent + "')");
     }
 
     private boolean productOnHand() {
