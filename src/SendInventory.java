@@ -10,34 +10,36 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 
-/**
- * Servlet implementation class SendInventory
- */
 @WebServlet("/SendInventory")
-public class SendInventory extends HttpServlet {
+public class SendInventory extends AbstractServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        String sku = request.getParameter("sku");
-        String date = request.getParameter("date");
-        int quantity = Integer.parseInt(request.getParameter("quantity"));
         HashMap<String, String> responseHash = new HashMap<String, String>();
 
-        try {
-            Product product = Product.fetchProductFromDB(sku);
-            product.setSentDate(date);
-            product.setQuantitySent(quantity);
+        if (isValidSession(request, response)) {
+            String sku = request.getParameter("sku");
+            String date = request.getParameter("date");
+            int quantity = Integer.parseInt(request.getParameter("quantity"));
 
-            product.send();
+            try {
+                Product product = Product.fetchProductFromDB(sku);
+                product.setSentDate(date);
+                product.setQuantitySent(quantity);
 
-            responseHash.put("status", "OK");
-            responseHash.put("message", "Inventory sent!");
+                product.send();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            responseHash.put("status", "Error");
-            responseHash.put("message", e.getMessage());
+                responseHash.put("status", "OK");
+                responseHash.put("message", "Inventory sent!");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                responseHash.put("status", "Error");
+                responseHash.put("message", e.getMessage());
+            }
+        } else {
+            responseHash.put("status", "Invalid");
         }
 
         String jsonResponse = JsonBuilder.toJson(responseHash);

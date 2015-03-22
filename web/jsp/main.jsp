@@ -5,18 +5,42 @@
 <head>
   <title>Main</title>
   <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <meta http-equiv="Cache-Control" content="no-cache no-store"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="expires" content="0"/>
-  <script type="text/javascript" src="js/jquery.js"></script>
-  <script type="text/javascript" src="js/jquery-ui.min.js"></script>
-  <script type="text/javascript" src="js/main.js"></script>
-  <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css"/>
-  <link rel="stylesheet" type="text/css" href="css/jquery-ui.structure.min.css"/>
-  <link rel="stylesheet" type="text/css" href="css/jquery-ui.theme.min.css"/>
-  <link rel="stylesheet" type="text/css" href="css/main.css"/>
+  <script type="text/javascript" src="../js/jquery.js"></script>
+  <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="../js/main.js"></script>
+  <link rel="stylesheet" type="text/css" href="../css/jquery-ui.min.css"/>
+  <link rel="stylesheet" type="text/css" href="../css/jquery-ui.structure.min.css"/>
+  <link rel="stylesheet" type="text/css" href="../css/jquery-ui.theme.min.css"/>
+  <link rel="stylesheet" type="text/css" href="../css/main.css"/>
 </head>
 
+<%
+  String username = null;
+  Cookie[] cookies = request.getCookies();
+
+  if (cookies != null) {
+    for (Cookie cookie : cookies) {
+      if (cookie.getName().equals("jadrn048")) {
+        username = cookie.getValue();
+      }
+    }
+  }
+
+  if (username == null) {
+    response.sendRedirect("/login.html");
+  }
+%>
+
 <body>
+
+<form method="post" action="/Logout">
+  <button class="button">Logout Now</button>
+</form>
+
+
 <div class="tabs inventory-container">
   <ul>
     <li><a href="#tabs-1">Inventory Received</a></li>

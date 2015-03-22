@@ -11,39 +11,37 @@ import javax.servlet.http.HttpServletResponse;
 import model.Product;
 import util.JsonBuilder;
 
-/**
- * Servlet implementation class ReceiveInventory
- */
 @WebServlet("/ReceiveInventory")
-public class ReceiveInventory extends HttpServlet {
+public class ReceiveInventory extends AbstractServlet {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-     *      response)
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        String sku = request.getParameter("sku");
-        String date = request.getParameter("date");
-        int quantity = Integer.parseInt(request.getParameter("quantity"));
         HashMap<String, String> responseHash = new HashMap<String, String>();
 
-        try {
-            Product product = Product.fetchProductFromDB(sku);
-            product.setReceivedDate(date);
-            product.setQuantityReceived(quantity);
+        if (isValidSession(request, response)) {
+            String sku = request.getParameter("sku");
+            String date = request.getParameter("date");
+            int quantity = Integer.parseInt(request.getParameter("quantity"));
 
-            product.receive();
+            try {
+                Product product = Product.fetchProductFromDB(sku);
+                product.setReceivedDate(date);
+                product.setQuantityReceived(quantity);
 
-            responseHash.put("status", "OK");
-            responseHash.put("message", "Inventory received!");
+                product.receive();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            responseHash.put("status", "Error");
-            responseHash.put("message", e.getMessage());
+                responseHash.put("status", "OK");
+                responseHash.put("message", "Inventory received!");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                responseHash.put("status", "Error");
+                responseHash.put("message", e.getMessage());
+            }
+        } else {
+            responseHash.put("status", "Invalid");
         }
 
         String jsonResponse = JsonBuilder.toJson(responseHash);

@@ -23,6 +23,7 @@ $(document).ready(function() {
     }
   });
 
+  // Fetch product
   $("input[name=sku]").change(function(){
     var container = $(this).closest("form");
     var sku = container.find("input[name=sku]").val();
@@ -35,17 +36,20 @@ $(document).ready(function() {
         container.find("[name=vendor]").val(response.vendor);
         container.find("[name=category]").val(response.category);
         container.find("[name=productName]").val(response.productName);
-      } else {
+      } else if (response.status == "Error") {
         displayMessage(response.message);
         container.find("[name=vendor]").val();
         container.find("[name=category]").val();
         container.find("[name=productName]").val();
+      } else if (response.status == "Invalid") {
+        window.location = "/login.html";
       }
     }, 'json').fail(function(){
       displayMessage("Failed to fetch product by sku " + sku);
     });
   });
 
+  // Receive or send inventory
   $('.inventorySubmit').on('click', function(){
     var action = $(this).data('action');
     var url, form;
@@ -67,8 +71,10 @@ $(document).ready(function() {
     $.post(url, params, function(response){
       if (response.status == "OK") {
         displayMessage(response.message, action);
-      } else {
+      } else if (response.status == "Error") {
         displayMessage(response.message, action);
+      } else if (response.status == "Invalid") {
+        window.location = "/login.html";
       }
     }, 'json').fail(function(){
       displayMessage("Failed to update inventory", action);

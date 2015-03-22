@@ -15,28 +15,29 @@ import util.JsonBuilder;
  * Servlet implementation class FetchProduct
  */
 @WebServlet("/FetchProduct")
-public class FetchProduct extends HttpServlet {
+public class FetchProduct extends AbstractServlet {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-     *      response)
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        String sku = request.getParameter("sku");
-        Product product = Product.fetchProductFromDB(sku);
         HashMap<String, String> responseHash = new HashMap<String, String>();
 
-        if (product != null) {
-            responseHash.put("status", "OK");
-            responseHash.put("vendor", product.getVendor());
-            responseHash.put("category", product.getCategory());
-            responseHash.put("productName", product.getProductName());
+        if (isValidSession(request, response)) {
+            String sku = request.getParameter("sku");
+            Product product = Product.fetchProductFromDB(sku);
+
+            if (product != null) {
+                responseHash.put("status", "OK");
+                responseHash.put("vendor", product.getVendor());
+                responseHash.put("category", product.getCategory());
+                responseHash.put("productName", product.getProductName());
+            } else {
+                responseHash.put("status", "Error");
+                responseHash.put("message", "Could not find product with SKU " + sku);
+            }
         } else {
-            responseHash.put("status", "Error");
-            responseHash.put("message", "Could not find product with SKU " + sku);
+            responseHash.put("status", "Invalid");
         }
 
         String jsonResponse = JsonBuilder.toJson(responseHash);

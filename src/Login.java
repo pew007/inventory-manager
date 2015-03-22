@@ -2,16 +2,10 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 
 import util.PasswordUtilities;
 
-/**
- * Servlet implementation class Login
- */
 @WebServlet("/Login")
 public class Login extends HttpServlet {
 
@@ -25,15 +19,17 @@ public class Login extends HttpServlet {
         String password = request.getParameter("password");
         String redirectUrl;
 
+        request.getSession();
         if (PasswordUtilities.isValidLogin(username, password)) {
             redirectUrl = "jsp/main.jsp";
-            HttpSession session = request.getSession(true);
-            session.setAttribute("user", username);
+            Cookie cookie = new Cookie("jadrn048", username);
+            cookie.setMaxAge(60 * 30);
+            response.addCookie(cookie);
+            response.sendRedirect(redirectUrl);
         } else {
             redirectUrl = "jsp/error.jsp";
             request.setAttribute("errorMessage", "Invalid username or password. Please log in again.");
+            request.getRequestDispatcher(redirectUrl).forward(request, response);
         }
-
-        request.getRequestDispatcher(redirectUrl).forward(request, response);
     }
 }
