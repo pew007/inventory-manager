@@ -206,7 +206,7 @@ public class Product {
     public void send() throws Exception {
         if (productOnHand()) {
 
-            if (this.getQuantitySent() > this.getQuantityReceived()) {
+            if (quantitySent > this.getQuantityReceived()) {
                 throw new Exception("Do not have enough inventory on hand for " + this.getSku());
             }
 
