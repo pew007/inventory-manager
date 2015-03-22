@@ -30,23 +30,28 @@ $(document).ready(function() {
     var url = servletHome + "FetchProduct";
     var param = {sku: sku};
 
-    $.post(url, param, function(response){
-      if (response.status == "OK") {
-        $("#status").hide();
-        container.find("[name=vendor]").val(response.vendor);
-        container.find("[name=category]").val(response.category);
-        container.find("[name=productName]").val(response.productName);
-      } else if (response.status == "Error") {
-        displayMessage(response.message);
-        container.find("[name=vendor]").val();
-        container.find("[name=category]").val();
-        container.find("[name=productName]").val();
-      } else if (response.status == "Invalid") {
-        window.location = "/login.html";
-      }
-    }, 'json').fail(function(){
-      displayMessage("Failed to fetch product by sku " + sku);
-    });
+    if (isValidSku(sku)) {
+      $.post(url, param, function(response){
+        if (response.status == "OK") {
+          $("#status").hide();
+          container.find("[name=vendor]").val(response.vendor);
+          container.find("[name=category]").val(response.category);
+          container.find("[name=productName]").val(response.productName);
+        } else if (response.status == "Error") {
+          displayMessage(response.message);
+          container.find("[name=vendor]").val();
+          container.find("[name=category]").val();
+          container.find("[name=productName]").val();
+          resetInventoryForm();
+        } else if (response.status == "Invalid") {
+          window.location = "/login.html";
+        }
+      }, 'json').fail(function(){
+        displayMessage("Failed to fetch product by sku " + sku);
+      });
+    } else {
+      $("input[name=sku]").val("Invalid SKU");
+    }
   });
 
   // Receive or send inventory
@@ -68,17 +73,27 @@ $(document).ready(function() {
         'quantity': form.find("input[name=quantity]").val()
     };
 
-    $.post(url, params, function(response){
-      if (response.status == "OK") {
-        displayMessage(response.message, action);
-      } else if (response.status == "Error") {
-        displayMessage(response.message, action);
-      } else if (response.status == "Invalid") {
-        window.location = "/login.html";
-      }
-    }, 'json').fail(function(){
-      displayMessage("Failed to update inventory", action);
-    })
+    if (isValidQuantity(params['quantity'])) {
+      $.post(url, params, function(response){
+        if (response.status == "OK") {
+          resetInventoryForm();
+          displayMessage(response.message, action);
+        } else if (response.status == "Error") {
+          resetInventoryForm();
+          displayMessage(response.message, action);
+        } else if (response.status == "Invalid") {
+          window.location = "/login.html";
+        }
+      }, 'json').fail(function(){
+        displayMessage("Failed to update inventory", action);
+      })
+    } else {
+      form.find("input[name=quantity]").val("Quantity must be a number greater than 0");
+    }
+  });
+
+  $('.inventoryReset').on('click', function(){
+    resetInventoryForm();
   });
 
   function getTodaysDate() {
@@ -98,6 +113,26 @@ $(document).ready(function() {
       status = $(".sendStatus")
     }
     status.html(message).show();
+  }
+
+  function isValidSku(sku) {
+    return sku.match(/^[A-Z]{3}-{1}[0-9]{3}$/);
+  }
+
+  function isValidQuantity(number) {
+    return !isNaN(number) && (number > 0);
+  }
+
+  function resetInventoryForm() {
+    $("input[name=sku]").val("");
+    $("input[name=vendor]").val("");
+    $("input[name=category]").val("");
+    $("input[name=productName]").val("");
+    $("input[name=quantity]").val("");
+
+    $(".date").val(getTodaysDate());
+
+    $(".status").hide();
   }
 
 });
